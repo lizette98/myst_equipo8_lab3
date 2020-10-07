@@ -8,3 +8,17 @@
 # -- repository: YOUR REPOSITORY URL                                                                     -- #
 # -- --------------------------------------------------------------------------------------------------- -- #
 """
+# Importar librerias
+import pandas as pd
+from os import listdir, path
+from os.path import isfile, join
+
+pd.set_option('display.expand_frame_rep', False)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', None)
+
+# Leer archivos
+#Ruta absoluta para archivos
+abspath = path.abspath('files/Historial.xlsx')
+data = pd.read_excel(abspath)
