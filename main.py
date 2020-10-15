@@ -8,3 +8,12 @@
 # -- repository: YOUR REPOSITORY URL                                                                     -- #
 # -- --------------------------------------------------------------------------------------------------- -- #
 """
+
+import functions as fn
+import pandas as pd
+from os import listdir, path
+
+abspath = path.abspath('files/Historial csv.csv')
+arch = pd.read_csv(abspath)
+
+archivo = fn.f_leer_archivo(param_archivo=arch)
