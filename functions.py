@@ -9,19 +9,9 @@
 # -- --------------------------------------------------------------------------------------------------- -- #
 """
 
-import pandas as pd
-from os import listdir, path
-
-pd.set_option('display.expand_frame_rep', False)
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_columns', None)
-pd.set_option('display.width', None)
-
-
 def f_leer_archivo(param_archivo):
-    # Leer archivos
-    # Ruta absoluta para archivos
-    abspath = path.abspath('files/Historial csv.csv')
-    param_archivo = pd.read_csv(abspath)
+    param_archivo['Item'] = param_archivo['Item'].map(lambda x: str(x)[:-2])
+    param_archivo['Item'] = param_archivo['Item'].str.upper()
 
     return param_archivo
+
