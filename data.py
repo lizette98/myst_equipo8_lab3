@@ -20,5 +20,7 @@ pd.set_option('display.width', None)
 
 # Leer archivos
 #Ruta absoluta para archivos
-abspath = path.abspath('files/Historial.xlsx')
-data = pd.read_excel(abspath)
+abspath = path.abspath('files/Historial csv.csv')
+archivo = pd.read_csv(abspath)
+
+
