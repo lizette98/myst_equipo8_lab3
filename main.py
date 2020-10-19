@@ -9,6 +9,7 @@
 # -- --------------------------------------------------------------------------------------------------- -- #
 """
 import pandas as pd
+import numpy as np
 from os import listdir, path
 
 #BEHAVIORAL FINANCE
@@ -16,26 +17,20 @@ from os import listdir, path
 import functions as fn
 import data as dt
 
-#----- 1. ESTADISTICA DESCRIPTIVA
-archivo = dt.archivo
+# ---------- 1. ESTADISTICA DESCRIPTIVA
 
-#--- 1.1 Funcion para leer el archivo ya limpio.
+# --- 1.1 Funcion para leer el archivo ya limpio.
+archivo = dt.archivo
 archivo = fn.f_leer_archivo(param_archivo=archivo)
 
-#FATLA COMPLETAR Y PASAR A FUNCION
-#--- 1.2 Funcion para obtener el multiplicador para diferencia de pips
-#Leer excel con todos los pips
-abspath = path.abspath('files/Oanda_Instruments.xlsx')
-pips_oanda = pd.read_excel(abspath)
+# --- 1.2 Funcion para obtener el multiplicador para diferencia de pips
+ins = dt.ins
+# En param_ins se escribe el activo deseado
+pip_size = fn.f_pip_size(param_ins='XAUUSD')
 
-#Cambiar nombre de Items
-pips_oanda = pips_oanda.rename(columns={'Symbol':'Item'})
-#Quitar puntos en el ticker
-pips_oanda['Item'] = pips_oanda['Item'].str.replace('.', '')
-df_pips = pd.merge(archivo, pips_oanda, on='Item')
-df_pips['PipLocation'] = pow(10/1, abs(df_pips['PipLocation']))
-df_pips = df_pips.iloc[:, [4, 20]]
-df_pips = df_pips.set_index('Item')
-#pip_size = df_pips.to_dict()
+# --- 1.3 Funcion de transformaciones de tiempo
+# FALTA COMPLETAR Y HACER FUNCION
+param_data = archivo
+param_data['Close Time'] = pd.to_datetime(param_data['Close Time'])
+param_data['Open Time'] = pd.to_datetime(param_data['Open Time'])
 
-EURUSD = df_pips['PipLocation']['EURUSD']
