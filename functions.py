@@ -30,3 +30,10 @@ def f_pip_size(param_ins):
 
     return int
 
+def f_columnas_tiempos(param_data):
+    param_data = dt.archivo
+    param_data['Close Time'] = pd.to_datetime(param_data['Close Time'])
+    param_data['Open Time'] = pd.to_datetime(param_data['Open Time'])
+    param_data['tiempo'] = (param_data['Close Time'] - param_data['Open Time']).dt.seconds
+
+    return param_data
