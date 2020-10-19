@@ -21,12 +21,16 @@ import data as dt
 
 # --- 1.1 Funcion para leer el archivo ya limpio.
 archivo = dt.archivo
-archivo = fn.f_leer_archivo(param_archivo=archivo)
+df_data = fn.f_leer_archivo(param_archivo=archivo)
 
 # --- 1.2 Funcion para obtener el multiplicador para diferencia de pips
 ins = dt.ins
 # En param_ins se escribe el activo deseado
-pip_size = fn.f_pip_size(param_ins='XAUUSD')
+df_data = fn.f_pip_size(param_ins='eurusd')
 
 # --- 1.3 Funcion de transformaciones de tiempo en segundos
-columna_tiempos = fn.f_columnas_tiempos(param_data=archivo)
+df_data = fn.f_columnas_tiempos(param_data=df_data)
+
+# --- 1.4 Funcion de transformaciones de pips
+# FALTA COMPLETAR Y HACER FUNCION
+

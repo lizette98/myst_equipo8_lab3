@@ -21,4 +21,5 @@ abspath = path.abspath('files/Oanda_Instruments.xlsx')
 pips_oanda = pd.read_excel(abspath)
 # Quitar guion bajo en el item
 pips_oanda['Item'] = pips_oanda['Item'].str.replace('_', '')
+pips_oanda['Item'] = pips_oanda['Item'].str.lower()
 ins = pips_oanda['Item']
