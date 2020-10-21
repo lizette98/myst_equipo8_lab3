@@ -18,6 +18,7 @@ import functions as fn
 import data as dt
 
 # ---------- 1. ESTADISTICA DESCRIPTIVA
+#PRUEBA1
 
 # --- 1.1 Funcion para leer el archivo ya limpio.
 archivo = dt.archivo
