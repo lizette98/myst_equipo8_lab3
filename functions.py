@@ -16,8 +16,6 @@ import data as dt
 
 
 def f_leer_archivo(param_archivo):
-    abspath = path.abspath('files/Historial Andrea.csv')
-    param_archivo = pd.read_csv(abspath)
     param_archivo['Item'] = param_archivo['Item'].map(lambda x: str(x)[:-2])
     param_archivo['Item'] = param_archivo['Item'].str.lower()
 
