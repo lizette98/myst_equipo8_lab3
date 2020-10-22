@@ -13,7 +13,7 @@ import pandas as pd
 from os import listdir, path
 
 # Leer historial de cada cuenta
-abspath = path.abspath('files/Historial Isamar.csv')
+abspath = path.abspath('files/Historial Andrea.csv')
 archivo = pd.read_csv(abspath)
 
 # Leer excel con todos los pips de Oanda

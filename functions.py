@@ -38,6 +38,20 @@ def f_columnas_tiempos(param_data):
     param_data['Open Time'] = pd.to_datetime(param_data['Open Time'])
     #Nueva columna de tiempo transcurrido en segundos
     param_data['tiempo'] = (param_data['Close Time'] - param_data['Open Time']).dt.seconds
-    param_data = param_data.rename(columns={'Price': 'OpenPrice', 'Price.1': 'ClosePrice'})
+    param_data = param_data.rename(columns={'Price': 'Open Price', 'Price.1': 'Close Price'})
     return param_data
 
+
+def f_columnas_pips(param_data):
+    param_data = dt.archivo
+    param_data['pips'] = 0
+    for i in range(len(param_data)):
+        n = f_pip_size(param_data['Item'].iloc[i])
+        if param_data['Type'][i] == 'sell':
+            param_data['pips'][i] = (param_data['OpenPrice'][i] - param_data['ClosePrice'][i]) * n
+
+        else:
+            param_data['pips'][i] = (param_data['ClosePrice'][i] - param_data['OpenPrice'][i]) * n
+    param_data['pips_acm'] = param_data['pips'].cumsum()
+    param_data['profit_acm'] = param_data['Profit'].cumsum()
+    return param_data

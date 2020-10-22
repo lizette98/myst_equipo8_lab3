@@ -27,11 +27,12 @@ df_data = fn.f_leer_archivo(param_archivo=archivo)
 # --- 1.2 Funcion para obtener el multiplicador para diferencia de pips
 ins = dt.ins
 # En param_ins se escribe el activo deseado
-df_data = fn.f_pip_size(param_ins='eurusd')
+pip_size = fn.f_pip_size(param_ins='eurusd')
 
 # --- 1.3 Funcion de transformaciones de tiempo en segundos
 df_data = fn.f_columnas_tiempos(param_data=df_data)
 
 # --- 1.4 Funcion de transformaciones de pips
 # FALTA COMPLETAR Y HACER FUNCION
+df_data = fn.f_columnas_pips(param_data=df_data)
 
