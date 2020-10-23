@@ -39,3 +39,10 @@ df_data = fn.f_columnas_pips(param_data=df_data)
 est_ba = fn.f_estadisticas_ba(param_data=df_data)
 
 
+# ---------- 2. METRICAS DE ATRIBUCION AL DESEMPEÑO
+
+# --- 2.1 Columna de evolucion de capital
+profit_acum_d = fn.f_profit_acm_d(param_data=df_data)
+
+# --- 2.2 DataFrame de evolucion de capital
+evolucion_capital = fn.f_evolucion_capital(param_data=df_data)

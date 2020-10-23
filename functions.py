@@ -13,8 +13,23 @@ import numpy as np
 from os import listdir, path
 import data as dt
 
+# ---------- 1. ESTADISTICA DESCRIPTIVA
+
 
 def f_leer_archivo(param_archivo):
+    """
+    Funcion para leer el archivo de historial de cada cuenta.
+
+    Parameters
+    ----------
+    param_archivo: DataFrame
+            Dataframe de historial con informacion del trading
+
+    Returns
+    -------
+    param_archivo: DataFrame
+            Dataframe de historial con informacion del trading
+    """
     param_archivo['Item'] = param_archivo['Item'].map(lambda x: str(x)[:-2])
     param_archivo['Item'] = param_archivo['Item'].str.lower()
 
@@ -22,6 +37,19 @@ def f_leer_archivo(param_archivo):
 
 
 def f_pip_size(param_ins):
+    """
+    Funcion para obtener el número multiplicador para expresar la diferencia de precios en pips.
+
+    Parameters
+    ----------
+    param_ins: str
+            Instrumento para asociarse al multiplicador de pips que le corresponde
+
+    Returns
+    -------
+    n: int
+            Multiplicador de pips que le corresponde al instrumento.
+    """
     pips_oanda = dt.pips_oanda
     pips_oanda = pips_oanda.set_index('Item')
     pips_oanda = pips_oanda['PipLocation']
@@ -31,25 +59,52 @@ def f_pip_size(param_ins):
 
 
 def f_columnas_tiempos(param_data):
-    param_data = dt.archivo
+    """
+    Funcion para agregar mas columnas de transformaciones de tiempo.
+
+    Parameters
+    ----------
+    param_data: DataFrame
+            DataFrame que contiene la informacion de las operaciones en oanda.
+
+    Returns
+    -------
+    param_data: DataFrame
+            Dataframe inicial, ahora con la columna del tiempo que duro la transaccion en segundos.
+    """
     param_data['Profit'] = param_data['Profit'].str.replace(' ', '')
     param_data['Close Time'] = pd.to_datetime(param_data['Close Time'])
     param_data['Open Time'] = pd.to_datetime(param_data['Open Time'])
+    param_data = param_data.rename(columns={'Close Time': 'CloseTime', 'Open Time': 'OpenTime'})
     #Nueva columna de tiempo transcurrido en segundos
-    param_data['tiempo'] = (param_data['Close Time'] - param_data['Open Time']).dt.seconds
-    param_data = param_data.rename(columns={'Price': 'Open Price', 'Price.1': 'Close Price'})
+    param_data['tiempo'] = (param_data['CloseTime'] - param_data['OpenTime']).dt.seconds
+    param_data = param_data.rename(columns={'Price': 'OpenPrice', 'Price.1': 'ClosePrice'})
     return param_data
 
 
 def f_columnas_pips(param_data):
+    """
+    Funcion para agregar mas columnas de transformaciones de pips.
+
+    Parameters
+    ----------
+    param_data: DataFrame
+            DataFrame que contiene la informacion de las operaciones en oanda.
+
+    Returns
+    -------
+    param_data: DataFrame
+            Dataframe anterior, ahora con las columnas de pips resultantes de cada operacion,
+            valor acumulado de pips y valor acumulado de la columna profit.
+    """
     param_data['pips'] = 0
     for i in range(len(param_data)):
         n = f_pip_size(param_data['Item'].iloc[i])
         if param_data['Type'][i] == 'sell':
-            param_data['pips'][i] = (param_data['Open Price'][i] - param_data['Close Price'][i]) * n
+            param_data['pips'][i] = (param_data['OpenPrice'][i] - param_data['ClosePrice'][i]) * n
 
         else:
-            param_data['pips'][i] = (param_data['Close Price'][i] - param_data['Open Price'][i]) * n
+            param_data['pips'][i] = (param_data['ClosePrice'][i] - param_data['OpenPrice'][i]) * n
     param_data['pips_acm'] = param_data['pips'].cumsum()
     param_data['Profit'] = pd.to_numeric(param_data['Profit'])
     param_data['profit_acm'] = param_data['Profit'].cumsum()
@@ -57,6 +112,25 @@ def f_columnas_pips(param_data):
 
 
 def f_estadisticas_ba(param_data):
+    """
+    Funcion para calcular estadisticas basicas y ranking por instrumentos.
+
+    Parameters
+    ----------
+    param_data: DataFrame
+            DataFrame que contiene la informacion de las operaciones en oanda actualizado.
+
+    Returns
+    -------
+    evolucion_capital: dict
+            Diccionario con las llaves 'df_1_tabla' y 'df_1_ranking'. Ambas son DataFrame.
+
+    df_1_tabla:
+            Dataframe con medida, valor y descripcion de las operaciones registadas.
+
+    df_1_ranking:
+            Dataframe con el instrumento y el ratio de efectividad de las operaciones realizadas.
+    """
 
     df_1_tabla = pd.DataFrame({'Ops totales': [len(param_data['Ticket']), 'Operaciones totales'],
                                'Ganadoras': [len(param_data[param_data['Profit'] >= 0]), 'Operaciones ganadoras'],
@@ -90,3 +164,69 @@ def f_estadisticas_ba(param_data):
     df_1_ranking = (tb1 * 100).sort_values(by='rank', ascending=False).T.transpose()
 
     return {'df_1_tabla': df_1_tabla.copy(), 'df_1_ranking': df_1_ranking.copy()}
+
+
+# ---------- 2. METRICAS DE ATRIBUCION AL DESEMPEÑO
+
+# 2.1 Evolucion de capital en la cuenta de trading
+def f_profit_acm_d(param_data):
+    """
+    Funcion para agregar columna de evolución de capital.
+
+    Parameters
+    ----------
+    param_data: DataFrame
+            DataFrame que contiene la informacion de las operaciones en oanda actualizado.
+
+    Returns
+    -------
+    param_data: DataFrame
+            Dataframe actualizado con columna de evolución de capital inicializada con $100,000 Usd
+            y se suma las ganancias o perdidas de la columna 'profit_acm'.
+    """
+
+    # Se forma una nueva columna inicializada en $100,000 donde se le suma/resta el profit acumulado
+    param_data['profit_acm_d'] = 100000 + param_data.profit_acm
+
+    return param_data.copy()
+
+def f_evolucion_capital(param_data):
+    """
+    Funcion para agregar mas columnas de transformaciones de tiempo.
+
+    Parameters
+    ----------
+    param_data: DataFrame
+            DataFrame del historico de operaciones.
+
+    Returns
+    -------
+    df_profit_diario: DataFrame
+            Dataframe con tres columnas:
+            1. timestamp: contiene las fechas dia a dia durante el priodo que se hizo trading.
+            2. profit_d: profit por dia por cada dia de todos los contenidos en el periodo que se hizo trading.
+            3. profit_acm_d: profit acumulado diario de la cuenta de capital.
+    """
+
+    # Agregar normalize a closetime
+    diario = pd.date_range(param_data.CloseTime.min(), param_data.CloseTime.max()).normalize()
+
+    # convertir a dataframe las fechas diarias
+    fechas = pd.DataFrame({'timestamp': diario})
+
+    # Agregar normalize a groupby
+    groups = param_data.groupby(pd.DatetimeIndex(param_data['CloseTime']).normalize())
+
+    profit = groups['Profit'].sum()
+    # convertir los profits diarios a dataframe
+    profit_diario = pd.DataFrame({'profit_d': [profit[i] if i in profit.index else 0 for i in diario]})
+    profit_acm = np.cumsum(profit_diario) + 100000
+    # juntar en un solo dataframe los dos dataframes anteriores fechas y profits diarios
+    f_p1 = pd.merge(fechas, profit_diario, left_index=True, right_index=True)
+    # juntar el dataframe anterior de los dos df con los profits acumulados
+    df_profit_diario1 = pd.merge(f_p1, profit_acm, left_index=True, right_index=True)
+    # renombrar las columnas del nuevo dataframe
+    df_profit_diario = df_profit_diario1.rename(columns={"profit_d_x": "profit_d", "profit_d_y": "profit_acm_d"})
+
+    return df_profit_diario
+
