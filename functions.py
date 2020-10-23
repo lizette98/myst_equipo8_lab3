@@ -54,3 +54,39 @@ def f_columnas_pips(param_data):
     param_data['Profit'] = pd.to_numeric(param_data['Profit'])
     param_data['profit_acm'] = param_data['Profit'].cumsum()
     return param_data
+
+
+def f_estadisticas_ba(param_data):
+
+    df_1_tabla = pd.DataFrame({'Ops totales': [len(param_data['Ticket']), 'Operaciones totales'],
+                               'Ganadoras': [len(param_data[param_data['Profit'] >= 0]), 'Operaciones ganadoras'],
+                               'Ganadoras_c': [len(param_data[(param_data['Type'] == 'buy') & (param_data['Profit'] >= 0)]),
+                                                   'Operaciones ganadoras de compra'],
+                               'Ganadoras_v': [len(param_data[(param_data['Type'] == 'sell') & (param_data['Profit'] >= 0)]),
+                                                   'Operaciones ganadoras de venta'],
+                               'Perdedoras': [len(param_data[param_data['Profit'] < 0]), 'Operaciones perdedoras'],
+                               'Perdedoras_c': [len(param_data[(param_data['Type'] == 'buy') & (param_data['Profit'] < 0)]),
+                                                    'Operaciones perdedoras de compra'],
+                               'Perdedoras_v': [len(param_data[(param_data['Type'] == 'sell') & (param_data['Profit'] < 0)]),
+                                                    'Operaciones perdedoras de venta'],
+                               'Mediana (Profit)': [param_data['Profit'].median(), 'Mediana de profit de operaciones'],
+                               'Mediana (Pips)': [param_data['pips'].median(), 'Mediana de pips de operaciones'],
+                               'r_efectividad': [len(param_data[param_data['Profit'] >= 0]) / len(param_data['Ticket']),
+                                                 'Ganadoras Totales/Operaciones Totales'],
+                               'r_proporcion': [len(param_data[param_data['Profit'] >= 0]) / len(param_data[param_data['Profit'] < 0]),
+                                                'Ganadoras Totales/Perdedoras Totales'],
+                               'r_efectividad_c': [len(param_data[(param_data['Type'] == 'buy') & (param_data['Profit'] >= 0)]) / len(param_data['Ticket']),
+                                   'Ganadoras Compras/Operaciones Totales'],
+                               'r_efectividad_v': [len(param_data[(param_data['Type'] == 'sell') & (param_data['Profit'] >= 0)]) / len(param_data['Ticket']),
+                                   'Ganadoras Ventas/Operaciones Totales'],
+                               }, index=['valor', 'descripcion']).transpose()
+
+    tb1 = pd.DataFrame({i: len(param_data[param_data.Profit > 0][param_data.Item == i]) / len(param_data[param_data.Item == i])
+                        for i in param_data.Item.unique()}, index=['rank']).transpose()
+
+    convert_dict = {'valor': float}
+    df_1_tabla = df_1_tabla.astype(convert_dict)
+
+    df_1_ranking = (tb1 * 100).sort_values(by='rank', ascending=False).T.transpose()
+
+    return {'df_1_tabla': df_1_tabla.copy(), 'df_1_ranking': df_1_ranking.copy()}

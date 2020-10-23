@@ -34,3 +34,8 @@ df_data = fn.f_columnas_tiempos(param_data=df_data)
 
 # --- 1.4 Funcion de transformaciones de pips
 df_data = fn.f_columnas_pips(param_data=df_data)
+
+# --- 1.5 Funcion para calcular estadisticas basicas y ranking por instrumentos
+est_ba = fn.f_estadisticas_ba(param_data=df_data)
+
+
