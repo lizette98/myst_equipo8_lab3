@@ -1,13 +1,14 @@
 
 """
 # -- --------------------------------------------------------------------------------------------------- -- #
-# -- project: A SHORT DESCRIPTION OF THE PROJECT                                                         -- #
+# -- project: Laboratorio 3 Behavioral Finance MYST                                                      -- #
 # -- script: functions.py : python script with general functions                                         -- #
-# -- author: YOUR GITHUB USER NAME                                                                       -- #
+# -- author: lizette98                                                                                   -- #
 # -- license: GPL-3.0 License                                                                            -- #
-# -- repository: YOUR REPOSITORY URL                                                                     -- #
+# -- repository: https://github.com/lizette98/myst_equipo8_lab3                                          -- #
 # -- --------------------------------------------------------------------------------------------------- -- #
 """
+
 import pandas as pd
 import numpy as np
 from os import listdir, path
@@ -72,6 +73,7 @@ def f_columnas_tiempos(param_data):
     param_data: DataFrame
             Dataframe inicial, ahora con la columna del tiempo que duro la transaccion en segundos.
     """
+    param_data = dt.archivo
     param_data['Profit'] = param_data['Profit'].str.replace(' ', '')
     param_data['Close Time'] = pd.to_datetime(param_data['Close Time'])
     param_data['Open Time'] = pd.to_datetime(param_data['Open Time'])
@@ -229,4 +231,72 @@ def f_evolucion_capital(param_data):
     df_profit_diario = df_profit_diario1.rename(columns={"profit_d_x": "profit_d", "profit_d_y": "profit_acm_d"})
 
     return df_profit_diario
+
+
+def f_estadisticas_mad(param_data):
+    """
+    Funcion para crear un DataFrame  con los resultados de cada Medida de Atribucion al Desempeño
+    expresadas en términos diarios: 'sharpe', 'drawdown_capi', 'drawup_capi'.
+
+    Parameters
+    ----------
+    param_data: DataFrame
+            DataFrame del historico de operaciones.
+
+    Returns
+    -------
+    MAD: DataFrame
+            Dataframe con tres columnas:
+            1. Sharpe Ratio: Rentabilidad menos la tasa de interés libre de riesgo
+            entre la volatilidad o desviación standard de esa rentabilidad en el mismo periodo.
+            2. DrawDown (Capital): Minusvalia máxima que se registró en la evolución de los valores (de 'profit_acm_d')
+            3. DrawUp (Capital): Plusvalía máxima que se registró en la evolución de los valores (de 'profit_acm_d')
+    """
+
+    profit_dia = f_evolucion_capital(param_data)
+
+    # Sharpe ratio
+    rp = np.log(profit_dia.profit_acm_d[1:].values / profit_dia.profit_acm_d[:-1].values)
+    rf = 0.05 / 300
+    sdp = np.std(rp)
+
+    # Drawdown Capital
+    where_row = profit_dia.loc[profit_dia['profit_acm_d'] == profit_dia.profit_acm_d.min()]
+    where_position = where_row.index.tolist()
+
+    prev_where = profit_dia.loc[0:where_position[0]]
+    where_max_prev = profit_dia.loc[profit_dia['profit_acm_d'] == prev_where.profit_acm_d.max()]
+    where_min_prev = profit_dia.loc[profit_dia['profit_acm_d'] == prev_where.profit_acm_d.min()]
+    max_ddown = where_max_prev.iloc[0]['profit_acm_d']
+    min_ddown = where_min_prev.iloc[0]['profit_acm_d']
+    ddown = max_ddown - min_ddown
+
+    fecha_i_ddown = where_max_prev.iloc[0]['timestamp']
+    fecha_f_ddown = where_min_prev.iloc[0]['timestamp']
+    drawdown = "{}, {}, ${:.2f}".format(fecha_i_ddown, fecha_f_ddown, ddown)
+
+    # DrawUp Capital
+
+    where_row_up = profit_dia.loc[profit_dia['profit_acm_d'] == profit_dia.profit_acm_d.max()]
+    where_position_up = where_row_up.index.tolist()
+
+    foll_where = profit_dia.loc[0:where_position_up[0]]
+    where_max_foll = profit_dia.loc[profit_dia['profit_acm_d'] == foll_where.profit_acm_d.max()]
+    where_min_foll = profit_dia.loc[profit_dia['profit_acm_d'] == foll_where.profit_acm_d.min()]
+    max_dup = where_max_foll.iloc[0]['profit_acm_d']
+    min_dup = where_min_foll.iloc[0]['profit_acm_d']
+    dup = max_dup - min_dup
+
+    fecha_f_dup = where_max_foll.iloc[0]['timestamp']
+    fecha_i_dup = where_min_foll.iloc[0]['timestamp']
+    drawup = "{}, {}, ${:.2f}".format(fecha_i_dup, fecha_f_dup, dup)
+    metricas = pd.DataFrame({'metrica': ['sharpe', 'drawdown_capi', 'drawdup_capi']})
+    valor = pd.DataFrame({'valor': [((rp.mean() - rf) / rp.std()), (drawdown), (drawup)]})
+    df_mad1 = pd.merge(metricas, valor, left_index=True, right_index=True)
+    descripcion = pd.DataFrame({'descripcion': ['Sharpe Ratio', 'DrawDown de Capital',
+                                                'DrawUp de Capital']})
+    df_est_mad = pd.merge(df_mad1, descripcion, left_index=True, right_index=True)
+
+    return df_est_mad
+
 

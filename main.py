@@ -1,11 +1,11 @@
 
 """
 # -- --------------------------------------------------------------------------------------------------- -- #
-# -- project: A SHORT DESCRIPTION OF THE PROJECT                                                         -- #
+# -- project: Laboratorio 3 Behavioral Finance MYST                                                      -- #
 # -- script: main.py : python script with the main functionality                                         -- #
-# -- author: YOUR GITHUB USER NAME                                                                       -- #
+# -- author: lizette98                                                                                   -- #
 # -- license: GPL-3.0 License                                                                            -- #
-# -- repository: YOUR REPOSITORY URL                                                                     -- #
+# -- repository: https://github.com/lizette98/myst_equipo8_lab3                                          -- #
 # -- --------------------------------------------------------------------------------------------------- -- #
 """
 import pandas as pd
@@ -46,3 +46,6 @@ profit_acum_d = fn.f_profit_acm_d(param_data=df_data)
 
 # --- 2.2 DataFrame de evolucion de capital
 evolucion_capital = fn.f_evolucion_capital(param_data=df_data)
+
+# --- 2.3 DataFrame de Medidas de Atribucion al Desempeño
+MAD = fn.f_estadisticas_mad(param_data=df_data)
