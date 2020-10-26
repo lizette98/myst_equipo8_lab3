@@ -11,7 +11,6 @@
 
 import pandas as pd
 import numpy as np
-from os import listdir, path
 import data as dt
 
 # ---------- 1. ESTADISTICA DESCRIPTIVA
