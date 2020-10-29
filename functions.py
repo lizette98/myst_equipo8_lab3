@@ -57,6 +57,7 @@ def f_pip_size(param_ins):
     pips_oanda = pips_oanda.set_index('Item')
     pips_oanda = pips_oanda['PipLocation']
     # Formula para obtener el multiplicador de cada activo
+    # En param_ins en main se escribe el activo deaseado
     n = pow(10 / 1, np.abs(pips_oanda[param_ins]))
 
     return n
@@ -106,21 +107,20 @@ def f_columnas_pips(param_data):
             Dataframe anterior, ahora con las columnas de pips resultantes de cada operacion,
             valor acumulado de pips y valor acumulado de la columna profit.
     """
-    #Inicializa columna de pips
+    # Inicializar columna de pips
     param_data['pips'] = 0
     # Ciclo para obtener los pips de cada operacion
     for i in range(len(param_data)):
         n = f_pip_size(param_data['Item'].iloc[i])
         if param_data['Type'][i] == 'sell':
             param_data['pips'][i] = (param_data['OpenPrice'][i] - param_data['ClosePrice'][i]) * n
-
         else:
             param_data['pips'][i] = (param_data['ClosePrice'][i] - param_data['OpenPrice'][i]) * n
     # Columna de pips acumulados
     param_data['pips_acm'] = param_data['pips'].cumsum()
-    #Convertir columna de Profit a int
+    # Convertir columna de Profit a int
     param_data['Profit'] = pd.to_numeric(param_data['Profit'])
-    #Columna de Profit acumulada
+    # Columna de Profit acumulada
     param_data['profit_acm'] = param_data['Profit'].cumsum()
     return param_data
 
@@ -205,6 +205,7 @@ def f_profit_acm_d(param_data):
 
     return param_data.copy()
 
+
 def f_evolucion_capital(param_data):
     """
     Funcion para analizar la evolucion del capital.
@@ -224,24 +225,24 @@ def f_evolucion_capital(param_data):
     """
 
     # Agregar normalize a Closetime
-    diario = pd.date_range(param_data.CloseTime.min(), param_data.CloseTime.max()).normalize()
+    CT_norm = pd.date_range(param_data.CloseTime.min(), param_data.CloseTime.max()).normalize()
 
     # Convertir a df las fechas diarias
-    fechas = pd.DataFrame({'timestamp': diario})
+    dates = pd.DataFrame({'timestamp': CT_norm})
 
-    # Agregar normalize a groupby
+    # Normalizar
     groups = param_data.groupby(pd.DatetimeIndex(param_data['CloseTime']).normalize())
-
+    # Profit
     profit = groups['Profit'].sum()
-    # Convertir los profits diarios a df
-    profit_diario = pd.DataFrame({'profit_d': [profit[i] if i in profit.index else 0 for i in diario]})
+    # Convertir las ganancias diarias a df
+    profit_diario = pd.DataFrame({'profit_d': [profit[i] if i in profit.index else 0 for i in CT_norm]})
     profit_acm = np.cumsum(profit_diario) + 100000
-    # Juntar en un solo df los dos df anteriores de fechas y profit diario
-    f_p1 = pd.merge(fechas, profit_diario, left_index=True, right_index=True)
+    # Combinar los df anteriores de fechas y profit diario
+    date_prof = pd.merge(dates, profit_diario, left_index=True, right_index=True)
     # Juntar el df anterior con los profit acumulados
-    df_profit_diario1 = pd.merge(f_p1, profit_acm, left_index=True, right_index=True)
-    # Renombrar las columnas del df resultante
-    df_profit_diario = df_profit_diario1.rename(columns={"profit_d_x": "profit_d", "profit_d_y": "profit_acm_d"})
+    date_prof_acm = pd.merge(date_prof, profit_acm, left_index=True, right_index=True)
+    # Renombrar las columnas del df final
+    df_profit_diario = date_prof_acm.rename(columns={"profit_d_x": "profit_d", "profit_d_y": "profit_acm_d"})
 
     return df_profit_diario
 
@@ -268,48 +269,56 @@ def f_estadisticas_mad(param_data):
 
     profit_dia = f_evolucion_capital(param_data)
 
-    # Sharpe ratio
+    # Sharpe
+    # Promedio de los rendimientos logaritmicos de profit_acm_d
     rp = np.log(profit_dia.profit_acm_d[1:].values / profit_dia.profit_acm_d[:-1].values)
+    # Tasa entre dias bursatiles en un año
     rf = 0.05 / 300
+    # Desviacion estandar de los rendimientos
     sdp = np.std(rp)
 
     # DrawDown Capital
+    # Tomar el profit minimo
     fila = profit_dia.loc[profit_dia['profit_acm_d'] == profit_dia.profit_acm_d.min()]
     position = fila.index.tolist()
-
     prev_where = profit_dia.loc[0:position[0]]
+    # Punto maximo y minimo del drawdown
     max_prev = profit_dia.loc[profit_dia['profit_acm_d'] == prev_where.profit_acm_d.max()]
     min_prev = profit_dia.loc[profit_dia['profit_acm_d'] == prev_where.profit_acm_d.min()]
     ddown_max = max_prev.iloc[0]['profit_acm_d']
     ddown_min = min_prev.iloc[0]['profit_acm_d']
     ddown = ddown_max - ddown_min
-
+    # Fechas del Drawdown
     date_max_ddown = max_prev.iloc[0]['timestamp']
     date_min_ddown = min_prev.iloc[0]['timestamp']
+    # Drawdown
     drawdown = "{}, {}, ${:.2f}".format(date_max_ddown, date_min_ddown, ddown)
 
     # DrawUp Capital
-
+    # Tomar el profit maximo
     fila_up = profit_dia.loc[profit_dia['profit_acm_d'] == profit_dia.profit_acm_d.max()]
     position_up = fila_up.index.tolist()
-
     foll_where = profit_dia.loc[0:position_up[0]]
+    # Punto maximo y minimo del DrawUp
     max_foll = profit_dia.loc[profit_dia['profit_acm_d'] == foll_where.profit_acm_d.max()]
     min_foll = profit_dia.loc[profit_dia['profit_acm_d'] == foll_where.profit_acm_d.min()]
     dup_max = max_foll.iloc[0]['profit_acm_d']
     dup_min = min_foll.iloc[0]['profit_acm_d']
     dup = dup_max - dup_min
-
+    # Fechas del DrawUp
     date_max_dup = max_foll.iloc[0]['timestamp']
     date_min_dup = min_foll.iloc[0]['timestamp']
+    #DrawUp
     drawup = "{}, {}, ${:.2f}".format(date_min_dup, date_max_dup, dup)
-    # Metricas
+
+
+    # Dataframe de Metricas
     metricas = pd.DataFrame({'metrica': ['sharpe', 'drawdown_capi', 'drawdup_capi']})
     valor = pd.DataFrame({'valor': [((rp.mean() - rf) / rp.std()), (drawdown), (drawup)]})
-    df_mad1 = pd.merge(metricas, valor, left_index=True, right_index=True)
+    df_mad = pd.merge(metricas, valor, left_index=True, right_index=True)
     descripcion = pd.DataFrame({'descripcion': ['Sharpe Ratio', 'DrawDown de Capital',
                                                 'DrawUp de Capital']})
-    df_est_mad = pd.merge(df_mad1, descripcion, left_index=True, right_index=True)
+    df_est_mad = pd.merge(df_mad, descripcion, left_index=True, right_index=True)
 
     return df_est_mad
 

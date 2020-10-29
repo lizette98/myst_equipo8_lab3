@@ -65,35 +65,40 @@ df_data = fn.f_leer_archivo(param_archivo=archivo)
 
 
 # Grafica de ranking
-def ranking(estadisticas):
+estadisticas_ba = fn.f_estadisticas_ba(df_data)
+def ranking(estadisticas_ba):
     """
     Parameters
     ----------
-    estadisticas : función : Función utilizada para calcular el ranking de asertividad de divisas
+    estadisticas_ba : función : Función utilizada para calcular el ranking de asertividad de divisas
     Returns
     -------
     graph : gráfica de pastel con plotly mostrando el porcentaje que representa la asertividad del total de pares usados
     """
-    estadisticas = fn.f_estadisticas_ba(df_data)
-    df_ranking = pd.DataFrame(estadisticas['df_1_ranking'])
+    # Llamamos la funcion de ranking calculada en functions
+    estadisticas_ba = fn.f_estadisticas_ba(df_data)
+    # Obtenemos solo el df de ranking
+    df_ranking = pd.DataFrame(estadisticas_ba['df_1_ranking'])
     df_1_ranking = df_ranking.reset_index()
+    # Renombrar columnas del df
     df_ranking = df_1_ranking.rename(columns={"index": "pares", "rank": "rank"})
 
-    pie_rank = go.Figure()
+    # Grafica de pastel
+    PieChart_Rank = go.Figure()
     labels = df_ranking['pares']
     values = df_ranking['rank']
-    pie_rank = go.Figure(data=[go.Pie(labels=labels, values=values,
+    PieChart_Rank = go.Figure(data=[go.Pie(labels=labels, values=values,
                                       pull=[0.2, 0.2, 0.2, 0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                             0])])
-    pie_rank.update_layout(title="Ranking", font=dict(size=16))
+    PieChart_Rank.update_layout(title="Ranking", font=dict(size=16))
     #pie_rank.update_traces(textposition='inside', textinfo='percent+label')
-    py.iplot(pie_rank)
-
-
-profit_d = fn.f_evolucion_capital(df_data)
+    py.iplot(PieChart_Rank)
 
 
 # Gráfica drawdown y drawup
+profit_d = fn.f_evolucion_capital(df_data)
+
+
 def drawd_drawup(profit_d):
     """
     Parameters
@@ -103,21 +108,22 @@ def drawd_drawup(profit_d):
     -------
     graph : gráfica de línea con plotly mostrando el profit acumulado
     """
+    # Llamamos la funcion con el dataframe de evolucion de capital
     profit_d = fn.f_evolucion_capital(df_data)
 
-    profs = go.Figure()
-    profs.add_trace(go.Scatter(x=profit_d.timestamp,
+    profits = go.Figure()
+    profits.add_trace(go.Scatter(x=profit_d.timestamp,
                                y=[None, None, None, None, None, None, None, 99775.28, None, None, 134035.28, None, None, None,
                                   None], name='drawup',
                                connectgaps=True, mode='lines', line={'dash': 'dash', 'color': 'green'}))
-    profs.add_trace(go.Scatter(x=profit_d.timestamp,
+    profits.add_trace(go.Scatter(x=profit_d.timestamp,
                                y=[100027.15, None, None, None, None, None, None, 99775.28, None, None, None, None, None, None,
                                   None], name='drawdown',
                                connectgaps=True, mode='lines', line={'dash': 'dash', 'color': 'red'}))
-    profs.add_trace(go.Scatter(x=profit_d.timestamp, y=profit_d.profit_acm_d, name='profit acumulado', mode='lines',
+    profits.add_trace(go.Scatter(x=profit_d.timestamp, y=profit_d.profit_acm_d, name='profit acumulado', mode='lines',
                                marker=dict(color='Black')))
 
-    profs.update_layout(title="Evolución del Capital Acumulado Diario", xaxis_title="Tiempo (fechas)", yaxis_title="Profit ($)")
+    profits.update_layout(title="Evolución del Capital Acumulado Diario", xaxis_title="Tiempo (fechas)", yaxis_title="Profit ($)")
 
     # profs.show()
-    py.iplot(profs)
+    py.iplot(profits)
