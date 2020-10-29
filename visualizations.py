@@ -22,9 +22,22 @@ py.offline.init_notebook_mode(connected = False)
 archivo = dt.archivo
 df_data = fn.f_leer_archivo(param_archivo=archivo)
 
+pip_size = fn.f_pip_size(param_ins='eurusd')
+
+df_data = fn.f_columnas_tiempos(param_data=df_data)
+
+df_data = fn.f_columnas_pips(param_data=df_data)
+
+profit_acum_d = fn.f_profit_acm_d(param_data=df_data)
+
+evolucion_capital = fn.f_evolucion_capital(param_data=df_data)
+
+MAD = fn.f_estadisticas_mad(param_data=df_data)
+
 
 # --- 4.1 Grafica de ranking
-#estadisticas_ba = fn.f_estadisticas_ba(df_data)
+estadisticas_ba = fn.f_estadisticas_ba(df_data)
+
 def ranking(estadisticas_ba):
     """
     Parameters
@@ -55,8 +68,7 @@ def ranking(estadisticas_ba):
 
 
 # --- 4.2 Gráfica drawdown y drawup
-# profit_d = fn.f_evolucion_capital(df_data)
-
+profit_d = fn.f_evolucion_capital(df_data)
 
 def drawd_drawup(profit_d):
     """

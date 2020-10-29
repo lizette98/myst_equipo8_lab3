@@ -31,7 +31,7 @@ def f_leer_archivo(param_archivo):
             Dataframe de historial con informacion del trading
     """
     # Quitar el "-e" de la columna Item
-    param_archivo['Item'] = param_archivo['Item'].map(lambda x: str(x)[:-2])
+    param_archivo['Item'] = param_archivo['Item'].str.replace('-e', '')
     # Poner los activos en minuscula
     param_archivo['Item'] = param_archivo['Item'].str.lower()
 
