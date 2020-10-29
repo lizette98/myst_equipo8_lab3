@@ -40,13 +40,20 @@ estadisticas_ba = fn.f_estadisticas_ba(df_data)
 
 def ranking(estadisticas_ba):
     """
+    Funcion para graficar el ranking de los activos obtenidos en functions.
+
     Parameters
     ----------
-    estadisticas_ba : función : Función utilizada para calcular el ranking de asertividad de divisas
+    estadisticas_ba: Function
+            Función utilizada para calcular el ranking de asertividad de divisas.
+
     Returns
     -------
-    graph : gráfica de pastel con plotly mostrando el porcentaje que representa la asertividad del total de pares usados
+    PieChart_Rank: Pie Chart Graph
+            Grafica de pastel que muestra el porcentaje que representa la asertividad
+            del total de CFDs usados en la cuenta.
     """
+
     # Llamamos la funcion de ranking calculada en functions
     estadisticas_ba = fn.f_estadisticas_ba(df_data)
     # Obtenemos solo el df de ranking
@@ -72,12 +79,18 @@ profit_d = fn.f_evolucion_capital(df_data)
 
 def drawd_drawup(profit_d):
     """
+    Funcion para graficar el drawdown y drawup de la cuenta de trading.
+
     Parameters
     ----------
-    profit_d : función : Función utilizada para el dataframe con el pd.DataFrame(datos)
+    profit_d: Function
+            Función utilizada para obtener el dataframe con los datos necesarios.
+
     Returns
     -------
-    graph : gráfica de línea con plotly mostrando el profit acumulado
+    profits: Graph
+            Grafica de linea que muestra el profit acumulado en la cuenta y su respectivo
+            drawdown y drawup.
     """
     # Llamamos la funcion con el dataframe de evolucion de capital
     profit_d = fn.f_evolucion_capital(df_data)
