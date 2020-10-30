@@ -10,12 +10,8 @@
 """
 
 import pandas as pd
-from os import listdir, path
+from os import path
 
-
-# Leer historial de cada cuenta
-abspath = path.abspath('files/historicos_alcg.csv')
-archivo = pd.read_csv(abspath)
 
 # Leer excel con todos los pips de Oanda
 abspath = path.abspath('files/Oanda_Instruments.xlsx')

@@ -18,8 +18,7 @@ import visualizations as vn
 # ---------- 1. ESTADISTICA DESCRIPTIVA
 
 # --- 1.1 Funcion para leer el archivo ya limpio.
-archivo = dt.archivo
-df_data = fn.f_leer_archivo(param_archivo=archivo)
+df_data = fn.f_leer_archivo(param_archivo='files/historicos_alcg.csv')
 
 # --- 1.2 Funcion para obtener el multiplicador para diferencia de pips
 ins = dt.ins

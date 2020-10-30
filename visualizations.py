@@ -19,8 +19,7 @@ import plotly.graph_objects as go
 import plotly.offline as py
 py.offline.init_notebook_mode(connected = False)
 
-archivo = dt.archivo
-df_data = fn.f_leer_archivo(param_archivo=archivo)
+df_data = fn.f_leer_archivo(param_archivo='files/historicos_ejemplo.csv')
 
 pip_size = fn.f_pip_size(param_ins='eurusd')
 

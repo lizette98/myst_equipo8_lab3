@@ -13,6 +13,8 @@ import pandas as pd
 import numpy as np
 import data as dt
 
+from os import listdir, path
+
 # ---------- 1. ESTADISTICA DESCRIPTIVA
 
 
@@ -28,8 +30,10 @@ def f_leer_archivo(param_archivo):
     Returns
     -------
     param_archivo: DataFrame
-            Dataframe de historial con informacion del trading
+            Dataframe de historial con informacion del trading ya limpio
     """
+    abspath = path.abspath(param_archivo)
+    param_archivo = pd.read_csv(abspath)
     # Quitar el "-e" de la columna Item
     param_archivo['Item'] = param_archivo['Item'].str.replace('-e', '')
     # Poner los activos en minuscula
@@ -62,7 +66,7 @@ def f_pip_size(param_ins):
 
     return n
 
-
+# NOTA: NO DA IGUAL A LOS DEL PROFE
 def f_columnas_tiempos(param_data):
     """
     Funcion para agregar mas columnas de transformaciones de tiempo.
@@ -78,14 +82,15 @@ def f_columnas_tiempos(param_data):
             Dataframe inicial, ahora con la columna del tiempo que duro la transaccion en segundos.
     """
     # Quitar espacios de columna de Profit
-    param_data['Profit'] = param_data['Profit'].str.replace(' ', '')
+    param_data['Profit'] = param_data['Profit'].replace(' ', '')
     # Convertir a datetime las columnas de tiempo
     param_data['Close Time'] = pd.to_datetime(param_data['Close Time'])
     param_data['Open Time'] = pd.to_datetime(param_data['Open Time'])
     # Renombrar las columnas de tiempo
     param_data = param_data.rename(columns={'Close Time': 'CloseTime', 'Open Time': 'OpenTime'})
     #Nueva columna de tiempo transcurrido en segundos
-    param_data['tiempo'] = (param_data['CloseTime'] - param_data['OpenTime']).dt.seconds
+    param_data['tiempo'] = [(param_data.loc[i, 'CloseTime'] - param_data.loc[i, 'OpenTime']).delta / 1e9
+                            for i in range(0, len(param_data['CloseTime']))]
     #Renombrar las columnas de precio de apertura y de cierre
     param_data = param_data.rename(columns={'Price': 'OpenPrice', 'Price.1': 'ClosePrice'})
 
