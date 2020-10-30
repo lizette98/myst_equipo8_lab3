@@ -10,7 +10,6 @@
 """
 
 # ---------- 4. Visualizations
-import data as dt
 import functions as fn
 
 import matplotlib.pyplot as plt
@@ -19,7 +18,7 @@ import plotly.graph_objects as go
 import plotly.offline as py
 py.offline.init_notebook_mode(connected = False)
 
-df_data = fn.f_leer_archivo(param_archivo='files/historicos_ejemplo.csv')
+df_data = fn.f_leer_archivo(param_archivo='files/historicos_alcg.csv')
 
 pip_size = fn.f_pip_size(param_ins='eurusd')
 

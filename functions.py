@@ -82,7 +82,7 @@ def f_columnas_tiempos(param_data):
             Dataframe inicial, ahora con la columna del tiempo que duro la transaccion en segundos.
     """
     # Quitar espacios de columna de Profit
-    param_data['Profit'] = param_data['Profit'].replace(' ', '')
+    param_data['Profit'] = param_data['Profit'].str.replace(' ', '')
     # Convertir a datetime las columnas de tiempo
     param_data['Close Time'] = pd.to_datetime(param_data['Close Time'])
     param_data['Open Time'] = pd.to_datetime(param_data['Open Time'])
