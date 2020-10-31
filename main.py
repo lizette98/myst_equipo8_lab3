@@ -9,7 +9,7 @@
 # -- --------------------------------------------------------------------------------------------------- -- #
 """
 
-#BEHAVIORAL FINANCE
+# BEHAVIORAL FINANCE
 
 import functions as fn
 import data as dt

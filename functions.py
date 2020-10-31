@@ -82,7 +82,9 @@ def f_columnas_tiempos(param_data):
             Dataframe inicial, ahora con la columna del tiempo que duro la transaccion en segundos.
     """
     # Quitar espacios de columna de Profit
-    param_data['Profit'] = param_data['Profit'].str.replace(' ', '')
+    #param_data['Profit'] = param_data['Profit'].str.replace(' ', '')
+    # Convertir columna de Profit a int
+    param_data['Profit'] = pd.to_numeric(param_data['Profit'])
     # Convertir a datetime las columnas de tiempo
     param_data['Close Time'] = pd.to_datetime(param_data['Close Time'])
     param_data['Open Time'] = pd.to_datetime(param_data['Open Time'])
@@ -121,10 +123,10 @@ def f_columnas_pips(param_data):
             param_data['pips'][i] = (param_data['OpenPrice'][i] - param_data['ClosePrice'][i]) * n
         else:
             param_data['pips'][i] = (param_data['ClosePrice'][i] - param_data['OpenPrice'][i]) * n
+    # Convertir columna de Profit a int
+    #param_data['Profit'] = pd.to_numeric(param_data['Profit'])
     # Columna de pips acumulados
     param_data['pips_acm'] = param_data['pips'].cumsum()
-    # Convertir columna de Profit a int
-    param_data['Profit'] = pd.to_numeric(param_data['Profit'])
     # Columna de Profit acumulada
     param_data['profit_acm'] = param_data['Profit'].cumsum()
     return param_data
