@@ -11,9 +11,14 @@
 
 import numpy as np
 import data as dt
+import pandas as pd                                       # procesamiento de datos
+from datetime import timedelta                            # para incrementos de fechas
+from oandapyV20 import API                                # conexion con broker OANDA
+import oandapyV20.endpoints.instruments as instruments    # informacion de precios historicos
+import requests
 
 from os import listdir, path
-import pandas as pd
+
 
 # ---------- 1. ESTADISTICA DESCRIPTIVA
 
@@ -331,12 +336,6 @@ def f_estadisticas_mad(param_data):
 
 
 # ---------- 3. BEHAVIORAL FINANCE
-import pandas as pd                                       # procesamiento de datos
-from datetime import timedelta                            # para incrementos de fechas
-from oandapyV20 import API                                # conexion con broker OANDA
-import oandapyV20.endpoints.instruments as instruments    # informacion de precios historicos
-import requests
-
 # -- ------------------------- FUNCION: Descargar precios ---------------------------------- #
 # -- --------------------------------------------------------------------------------------- #
 # -- Descargar precios historicos con OANDA
@@ -499,4 +498,52 @@ def f_precios_masivos(p0_fini, p1_ffin, p2_gran, p3_inst, p4_oatk, p5_ginc):
 
         return r_df_final
 
-# ---
+
+# --- Sesgos
+
+# Descarga de precios necesarios para los sesgos
+def func_precios(param_data):
+    # Nueva columna de fechas para descargar precios
+    param_data['fechas'] = list(param_data['CloseTime'].astype(str).str[0:10])
+    # Ordenar por Close Time
+    param_data.sort_values(by='CloseTime', inplace=True, ascending=True)
+    param_data.reset_index(inplace=True, drop=True)
+    start = str(param_data['CloseTime'].min())[0:10]
+    end = str(param_data['CloseTime'].max())[0:10]
+    total_days = pd.date_range(start=start, end=end, freq='D')
+    param_data['CloseTime'] = list([str(i)[0:10] for i in param_data['CloseTime']])
+
+    # Definir parametros para la funcion de precios masivos
+    oa_in = "SPX500_USD"  # Instrumento
+    oa_gn = "D"  # Granularidad de velas (M1: Minuto, M5: 5 Minutos, M15: 15 Minutos)
+    fini = pd.to_datetime(param_data['fechas'].min()).tz_localize('GMT') - timedelta(minutes=800) # Fecha inicial
+    fini = fini + timedelta(days=1)
+    ffin = pd.to_datetime(param_data['fechas'].max()).tz_localize('GMT') - timedelta(minutes=800) # Fecha final
+    ffin = ffin + timedelta(days=3)
+
+    precios = f_precios_masivos(p0_fini=fini, p1_ffin=ffin, p2_gran=oa_gn, p3_inst=oa_in, p4_oatk=dt.oa_token, p5_ginc=4900)
+
+    return precios
+
+
+def f_be_de(param_data):
+    # Nueva columna de ratio del capital acumulado
+    param_data['profit_acm_ratio'] = 0
+    for i in range(len(param_data)):
+        if i == 0:
+            # Calcular el ratio (capital_ganadora/capital_acm)*100
+            param_data['profit_acm_ratio'] = (param_data['Profit'][i] / 100000) * 100
+        else:
+            # (capital_perdedora/capital_acm)*100 para cada operacion
+            param_data['profit_acm_ratio'] = (param_data['Profit'][i] / param_data['profit_acm_d'][i - 1]) * 100
+
+    # DataFrame de operaciones ganadoras en la cuenta
+    df_ganadoras = param_data[param_data['Profit'] > 0]
+    # Fecha de cierre de las ganadoras
+    ct_ganadoras = df_ganadoras['CloseTime']
+    # DataFrame de operaciones perdedoras en la cuenta
+    df_perdedoras = param_data[param_data['Profit'] < 0]
+    df_ganadoras.reset_index(inplace=True, drop=True)
+    df_perdedoras.reset_index(inplace=True, drop=True)
+
+
