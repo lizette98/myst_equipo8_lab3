@@ -1,7 +1,8 @@
 #Lab3: Behavioral Finance
 
 ## Description
-*This project proposes tools to analyze the trading performance in different accounts, the behavior of the accounts, capital and the trader.*
+En este proyecto se analizan los históricos del laboratorio 2, en donde se analiza realmente que tan buenas fueron las operaciones hechas
+a lo largo del laboratorio pasado, analizando operaciones ganadoras y perdedoras.
 
 ## Install dependencies
 
@@ -17,6 +18,8 @@ Or you can manually install one by one using the name and version in the file.
 
 ## Authors
 *Andrea Lizette Contreras González, Financial Engineering Student at Instituto Tecnologico y de Estudios Superiores de Occidente (ITESO).*
+*Isamar Garcia Gomez
+*Erendira Marin Haro
 
 ## License
 **GNU General Public License v3.0** 
