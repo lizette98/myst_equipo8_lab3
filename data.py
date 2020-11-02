@@ -10,12 +10,8 @@
 """
 
 import pandas as pd
-from os import listdir, path
+from os import path
 
-
-# Leer historial de cada cuenta
-abspath = path.abspath('files/historicos_alcg.csv')
-archivo = pd.read_csv(abspath)
 
 # Leer excel con todos los pips de Oanda
 abspath = path.abspath('files/Oanda_Instruments.xlsx')
@@ -25,6 +21,7 @@ pips_oanda['Item'] = pips_oanda['Item'].str.replace('_', '')
 pips_oanda['Item'] = pips_oanda['Item'].str.lower()
 ins = pips_oanda['Item']
 
+<<<<<<< HEAD
 """
 def f_pip_size(param_ins):
 
@@ -108,5 +105,11 @@ elif first_row < last_row:
 else: 
        raise ValueError('first row must be <= last row')
 
+=======
+# Oanda API
+oa_token = 'eb8975434a3bd282418395369190f677-90abc8fae1fdc5b785095416308fa843'
+
+#AQUI PUEDES EMPEZAR TU CODIGO ISA:
+>>>>>>> d32c12da2459db00833a64a6272502097e95cb5c
 
 '''
