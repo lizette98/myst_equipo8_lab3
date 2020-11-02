@@ -11,7 +11,6 @@
 
 # ---------- 4. Visualizations
 import functions as fn
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.graph_objects as go
