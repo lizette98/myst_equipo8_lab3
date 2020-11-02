@@ -12,8 +12,9 @@
 import pandas as pd
 from os import listdir, path
 
+
 # Leer historial de cada cuenta
-abspath = path.abspath('files/Historial Andrea.csv')
+abspath = path.abspath('files/historicos_alcg.csv')
 archivo = pd.read_csv(abspath)
 
 # Leer excel con todos los pips de Oanda
@@ -23,3 +24,6 @@ pips_oanda = pd.read_excel(abspath)
 pips_oanda['Item'] = pips_oanda['Item'].str.replace('_', '')
 pips_oanda['Item'] = pips_oanda['Item'].str.lower()
 ins = pips_oanda['Item']
+
+#AQUI PUEDES EMPEZAR TU CODIGO ISA:
+
