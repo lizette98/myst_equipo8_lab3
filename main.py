@@ -54,8 +54,40 @@ MAD = fn.f_estadisticas_mad(param_data=df_data)
 precios = fn.func_precios(param_data=df_data)
 
 # --- 3.2 Pruebas de sesgos
+'''
+df_data['ratio_capital_acm'] = 0
+for i in range(len(df_data)):
+    if i == 0:
+        df_data['ratio_capital_acm'] = (df_data['Profit'][i]/100000)*100
+    else:
+        df_data['ratio_capital_acm'] = (df_data['Profit'][i]/df_data['profit_acm_d'][i-1]) * 100
+
+# Separamos las operaciones en perdedoras y ganadoras para posteriormente usar las ganadoras como ancla
+ganadoras = df_data[df_data['Profit'] > 0]
+# Y guardamos el cierre de operaciones de las ganadoras
+ganadoras_ct = ganadoras['CloseTime']
+# Tambien sacamos las perdedoras por si las necesitamos más adelante
+perdedoras = df_data[df_data['Profit'] < 0]
+# Como sabemos que nuestra ancla van a ser las operaciones ganadoras las separamos del resto y creamos un DF
+# Pero primero reseteamos el índice para futuros problemas de indexación
+ganadoras.reset_index(inplace=True, drop=True)
+perdedoras.reset_index(inplace=True, drop=True)
+
+df_ancla = ganadoras.loc[0,['profit_acm_d','ratio_acm']]
 
 
+
+
+
+
+
+
+
+
+
+
+
+'''
 
 # ---------- 4. VISUALIZACIONES
 

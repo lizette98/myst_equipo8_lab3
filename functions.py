@@ -546,4 +546,11 @@ def f_be_de(param_data):
     df_ganadoras.reset_index(inplace=True, drop=True)
     df_perdedoras.reset_index(inplace=True, drop=True)
 
+    # Diccionario para resultado final
+    dict = {'ocurrencias': {'timestamp': {}, 'operaciones': {}}, 'resultados': {}}
+
+
+
+
+
 
