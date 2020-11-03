@@ -110,3 +110,27 @@ def drawd_drawup(profit_d):
     # profs.show()
     py.iplot(profits)
 
+# --- 4.3 Disposition Effect
+
+sesgos = fn.f_be_de(param_data=df_data)
+
+
+def sesgos(sesgos):
+    """
+    Parameters
+    ----------
+    sesgos : función : Función utilizada para calcular los sesgos cognitivos
+    Returns
+    -------
+    graph : gráfica de barras representando valores porcentuales del status-quo y aversión al riesgo
+    """
+
+    sesgos = fn.f_be_de(param_data=df_data)
+    #df_resultados = pd.DataFrame(sesgos['resultados'])
+    df_results = sesgos.drop([0, 3])
+    sesgs_bar = go.Figure(data=[go.Bar(x=df_results['mediciones'], y=df_results['resultados'])])
+    sesgs_bar.update_layout(title="Disposition Effect", xaxis_title="Mediciones", yaxis_title="Resultados (%)")
+    # sesgs_bar.show()
+    py.iplot(sesgs_bar)
+
+

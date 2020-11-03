@@ -21,7 +21,12 @@ pips_oanda['Item'] = pips_oanda['Item'].str.replace('_', '')
 pips_oanda['Item'] = pips_oanda['Item'].str.lower()
 ins = pips_oanda['Item']
 
-<<<<<<< HEAD
+# Oanda API
+oa_token = 'eb8975434a3bd282418395369190f677-90abc8fae1fdc5b785095416308fa843'
+
+
+
+
 """
 def f_pip_size(param_ins):
 
@@ -43,7 +48,7 @@ def f_pip_size(param_ins):
     n = pow(10 / 1, np.abs(pips_oanda[param_ins]))
 
     return n
-   """
+    
 
 def f_pip_size(param_data):
     pips_oanda = []
@@ -106,10 +111,9 @@ else:
        raise ValueError('first row must be <= last row')
 
 =======
-# Oanda API
-oa_token = 'eb8975434a3bd282418395369190f677-90abc8fae1fdc5b785095416308fa843'
 
-#AQUI PUEDES EMPEZAR TU CODIGO ISA:
+
+
 >>>>>>> d32c12da2459db00833a64a6272502097e95cb5c
 
-'''
+"""
