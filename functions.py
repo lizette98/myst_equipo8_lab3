@@ -47,6 +47,17 @@ def f_leer_archivo(param_archivo):
     return param_archivo
 
 
+def f_instrument():
+    # Leer excel con todos los pips de Oanda
+    from os import path
+
+    abspath = path.abspath('files/Oanda_Instruments.xlsx')
+    pips_oanda = pd.read_excel(abspath)
+    instrument = pips_oanda['Item']
+
+    return instrument
+
+
 def f_pip_size(param_ins):
     """
     Funcion para obtener el número multiplicador para expresar la diferencia de precios en pips.
@@ -514,7 +525,7 @@ def func_precios(param_data):
     param_data['CloseTime'] = list([str(i)[0:10] for i in param_data['CloseTime']])
 
     # Definir parametros para la funcion de precios masivos
-    oa_in = "SPX500_USD"  # Instrumento
+    oa_in = "GBP_USD"  # Instrumento
     oa_gn = "D"  # Granularidad de velas (M1: Minuto, M5: 5 Minutos, M15: 15 Minutos)
     fini = pd.to_datetime(param_data['fechas'].min()).tz_localize('GMT') - timedelta(minutes=800) # Fecha inicial
     fini = fini + timedelta(days=1)
@@ -546,4 +557,79 @@ def f_be_de(param_data):
     df_ganadoras.reset_index(inplace=True, drop=True)
     df_perdedoras.reset_index(inplace=True, drop=True)
 
+    # Diccionario para resultado final
+    dict = {'ocurrencias': {'timestamp': {}, 'operaciones': {}}, 'resultados': {}}
 
+    # Convertir Close y Open time a str
+    df_ganadoras['CloseTime'] = list([str(i)[0:10] for i in df_ganadoras['CloseTime']])
+    df_perdedoras['CloseTime'] = list([str(i)[0:10] for i in df_perdedoras['CloseTime']])
+    df_perdedoras['OpenTime'] = list([str(i)[0:10] for i in df_perdedoras['OpenTime']])
+
+    for i in range(len(df_ganadoras)):
+        for j in range(len(df_perdedoras)):
+            # Marcar inicio y final de las operaciones perdedoras
+            inicio_op = df_perdedoras['OpenTime'][j]
+            fin_op = df_perdedoras['CloseTime'][j]
+            # Obtener dias totales
+            dias_tot = pd.date_range(start=inicio_op, end=fin_op, freq='D')
+            # Ciclo para ver si en el momento que la ganadora cerró estaba abierta la operación perdedora
+            if df_ganadoras['CloseTime'][i] in dias_tot:
+                # Inicializar contador de ocurrencias
+                ocurrencias = 0
+                ocurrencias += 1
+                # Llenado de operaciones del diccionario
+                operaciones = {'operaciones': {'ganadora': {'instrumento': df_ganadoras['Item'][i],
+                                                            'volumen': df_ganadoras['Size'][i],
+                                                            'sentido': df_ganadoras['Type'][i],
+                                                            'profit_ganadora': df_ganadoras['Profit'][i]},
+                                      'perdedora': {'instrumento': df_perdedoras['Item'][j], 'volumen': df_perdedoras['Size'][j],
+                                                    'sentido': df_perdedoras['Type'][j],
+                                                    'profit_perdedora': df_perdedoras['Profit'][j]}},
+                      'ratio_cp_profit_acm': df_perdedoras['Profit'][j] / df_ganadoras['profit_acm_d'][i],
+                      'ratio_cg_profit_acm': df_ganadoras['Profit'][i] / df_ganadoras['profit_acm_d'][i],
+                      'ratio_cp_cg': df_perdedoras['Profit'][j] / df_ganadoras['Profit'][i]}
+
+                # Agregar TimeStamp al Diccionario
+                tsmp = 0
+                tsmp = {'TimeStamp': df_ganadoras['CloseTime'][i]}
+                # Llenado de resultados del diccionario
+                # Calculo de Statusquo
+                # Inicializar statusquo
+                status_quo = 0
+                if np.abs(df_perdedoras['Profit'][j] / df_ganadoras['profit_acm_d'][i]) < np.abs(df_ganadoras['Profit'][i] / df_ganadoras['profit_acm_d'][i]):
+                    status_quo += 1
+                # Inicializar aversion a la perdida
+                aversion_perdida = 0
+                # Contabilizar si el ratio de profit_perdedora/profit_ganadora es > 1.5
+                if np.abs(df_perdedoras['Profit'][j] / df_ganadoras['Profit'][i]) > 1.5:
+                    aversion_perdida+= 1
+            # Obtener cada numero de ocurrencia
+            num_ocurr = 'ocurrencia, %s' % str(ocurrencias)
+            # Llenar operaciones y timestamp de las ocurrencias del diccionario
+            dict['ocurrencias']['operaciones'][num_ocurr] = operaciones
+            dict['ocurrencias']['timestamp'][num_ocurr] = tsmp
+
+    # Cantidad de ocurrencias
+    dict['cantidad'] = ocurrencias
+    # Statusquo y aversion a la perdida en porcentaje
+    status_quo_porc = (status_quo/ocurrencias) * 100
+    aversion_perdida_porc = (aversion_perdida / ocurrencias) * 100
+
+    #--- Principip 3 Sensibilidad decreciente a los cambios
+    sensibilidad_decr = '-'
+    # 1. Si el capital_acm de la cuenta aumentó.
+    # 2. Si el capital_ganadora & capital_perdedora aumentaron.
+    # 3. Si el ratio capital_perdedora/capital_ganadora sigue siendo > 1.5.
+    if df_ganadoras['profit_acm_d'][0] < df_ganadoras['profit_acm_d'].iloc[-1] and df_ganadoras['Profit'][0] < df_ganadoras['Profit'].iloc[-1] or \
+            df_perdedoras['Profit'][0] < df_perdedoras['Profit'].iloc[-1] and (df_perdedoras['Profit'].min() / df_ganadoras['Profit'].max()) > 1.5:
+        sensibilidad_decr = 'si'
+    else:
+        sensibilidad_decr = 'no'
+
+    # DataFrame para resultados {}
+    df_resultados = {'ocurrencias': [ocurrencias], 'status_quo': [status_quo_porc],
+                'aversion_perdida': [aversion_perdida_porc],
+                'sensibilidad_decreciente': [sensibilidad_decr]}
+    dict['resultados'] = pd.DataFrame(df_resultados)
+
+    return dict

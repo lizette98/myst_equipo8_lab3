@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.offline as py
+
 py.offline.init_notebook_mode(connected = False)
 
 df_data = fn.f_leer_archivo(param_archivo='files/historicos_alcg.csv')
@@ -109,108 +110,27 @@ def drawd_drawup(profit_d):
     # profs.show()
     py.iplot(profits)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ---------- 3. BEHAVIORAL FINANCE
-
-# --- 3.1 Descarga de precios
-import pandas as pd
-from datetime import timedelta
-oa_in = "SPX500_USD"  # Instrumento
-oa_gn = "D"       # Granularidad de velas (M1: Minuto, M5: 5 Minutos, M15: 15 Minutos)
-
-df_data['fechas'] = list(df_data['CloseTime'].astype(str).str[0:10])
-fini = pd.to_datetime(df_data['fechas'].min()).tz_localize('GMT') - timedelta(minutes=800) # Fecha inicial
-fini = fini + timedelta(days=1)
-ffin = pd.to_datetime(df_data['fechas'].max()).tz_localize('GMT') - timedelta(minutes=800) # Fecha final
-ffin = ffin + timedelta(days=3)
-
-precios = fn.f_precios_masivos(p0_fini=fini, p1_ffin=ffin, p2_gran=oa_gn,
-                          p3_inst=oa_in, p4_oatk=dt.oa_token, p5_ginc=4900)
-
-# --- 3.2 Pruebas de sesgos
-
-df_data['ratio_capital_acm'] = 0
-for i in range(len(df_data)):
-    if i == 0:
-        df_data['ratio_capital_acm'] = (df_data['Profit'][i]/100000)*100
-    else:
-        df_data['ratio_capital_acm'] = (df_data['Profit'][i]/df_data['profit_acm_d'][i-1]) * 100
-
-# Separamos las operaciones en perdedoras y ganadoras para posteriormente usar las ganadoras como ancla
-ganadoras = df_data[df_data['Profit'] > 0]
-# Y guardamos el cierre de operaciones de las ganadoras
-ganadoras_ct = ganadoras['CloseTime']
-# Tambien sacamos las perdedoras por si las necesitamos más adelante
-perdedoras = df_data[df_data['Profit'] < 0]
-# Como sabemos que nuestra ancla van a ser las operaciones ganadoras las separamos del resto y creamos un DF
-# Pero primero reseteamos el índice para futuros problemas de indexación
-ganadoras.reset_index(inplace=True, drop=True)
-perdedoras.reset_index(inplace=True, drop=True)
+# --- 4.3 Disposition Effect
+
+sesgos = fn.f_be_de(param_data=df_data)
+
+
+def sesgos(sesgos):
+    """
+    Parameters
+    ----------
+    sesgos : función : Función utilizada para calcular los sesgos cognitivos
+    Returns
+    -------
+    graph : gráfica de barras representando valores porcentuales del status-quo y aversión al riesgo
+    """
+
+    sesgos = fn.f_be_de(param_data=df_data)
+    #df_resultados = pd.DataFrame(sesgos['resultados'])
+    df_results = sesgos.drop([0, 3])
+    sesgs_bar = go.Figure(data=[go.Bar(x=df_results['mediciones'], y=df_results['resultados'])])
+    sesgs_bar.update_layout(title="Disposition Effect", xaxis_title="Mediciones", yaxis_title="Resultados (%)")
+    # sesgs_bar.show()
+    py.iplot(sesgs_bar)
 
 
