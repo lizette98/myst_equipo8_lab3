@@ -1,8 +1,10 @@
 #Lab3: Behavioral Finance
 
 ## Description
-En este proyecto se analizan los históricos del laboratorio 2, en donde se analiza realmente que tan buenas fueron las operaciones hechas
+En este proyecto se analizan los históricos del laboratorio 2 a partir de herramientas computacionales, 
+en donde se analiza el desempeño de las operaciones realizadas personalmente
 a lo largo del laboratorio pasado, analizando operaciones ganadoras y perdedoras.
+En este punto se introduce el behavioral finance.
 
 ## Install dependencies
 
@@ -17,9 +19,9 @@ Or you can manually install one by one using the name and version in the file.
 *Add here examples of core functionalities for the project in this repository.*
 
 ## Authors
-*Andrea Lizette Contreras González, Financial Engineering Student at Instituto Tecnologico y de Estudios Superiores de Occidente (ITESO).*
-*Isamar Garcia Gomez
-*Erendira Marin Haro
+*Andrea Lizette Contreras González*
+*Isamar Garcia Gomez*
+*Erendira Marin Haro*
 
 ## License
 **GNU General Public License v3.0** 
