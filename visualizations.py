@@ -125,12 +125,15 @@ def sesgos(sesgos):
     graph : gráfica de barras representando valores porcentuales del status-quo y aversión al riesgo
     """
 
+    fig = plt.figure()
+
     sesgos = fn.f_be_de(param_data=df_data)
-    #df_resultados = pd.DataFrame(sesgos['resultados'])
-    df_results = sesgos.drop([0, 3])
-    sesgs_bar = go.Figure(data=[go.Bar(x=df_results['mediciones'], y=df_results['resultados'])])
-    sesgs_bar.update_layout(title="Disposition Effect", xaxis_title="Mediciones", yaxis_title="Resultados (%)")
-    # sesgs_bar.show()
-    py.iplot(sesgs_bar)
+    sesgos_plot = sesgos['resultados'].plot(kind='bar', grid=True)
+    plt.title("Behavioral Finance")
+    plt.xlabel("Mediciones")
+    plt.ylabel("Resultado")
+    plt.show(sesgos_plot)
+
+    return plt.show(sesgos_plot)
 
 

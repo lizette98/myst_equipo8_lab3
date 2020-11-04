@@ -46,7 +46,7 @@ def f_leer_archivo(param_archivo):
 
     return param_archivo
 
-
+''' 
 def f_instrument():
     # Leer excel con todos los pips de Oanda
     from os import path
@@ -56,7 +56,7 @@ def f_instrument():
     instrument = pips_oanda['Item']
 
     return instrument
-
+'''
 
 def f_pip_size(param_ins):
     """
@@ -514,6 +514,19 @@ def f_precios_masivos(p0_fini, p1_ffin, p2_gran, p3_inst, p4_oatk, p5_ginc):
 
 # Descarga de precios necesarios para los sesgos
 def func_precios(param_data):
+    """
+    Funcion visualizar como funciona la descarga de precios masivos.
+
+    Parameters
+    ----------
+    param_data: DataFrame
+            DataFrame del historico de operaciones.
+
+    Returns
+    -------
+    precios: DataFrmae
+            DataFrame con los precios descargados del activo deseado.
+    """
     # Nueva columna de fechas para descargar precios
     param_data['fechas'] = list(param_data['CloseTime'].astype(str).str[0:10])
     # Ordenar por Close Time
@@ -538,6 +551,21 @@ def func_precios(param_data):
 
 
 def f_be_de(param_data):
+    """
+    Funcion para recibir información sobre la presencia del Disposition Effect
+    en el histórico de operaciones.
+
+    Parameters
+    ----------
+    param_data: DataFrame
+            DataFrame del historico de operaciones para buscar la presencia o no del sesgo.
+
+    Returns
+    -------
+    dict: Dict
+            Diccionario con las ocurrencias, operaciones, timestamp, ratios y
+            otra llave de resultados la cual es un dataframe con los principios del sesgo.
+    """
     # Nueva columna de ratio del capital acumulado
     param_data['profit_acm_ratio'] = 0
     for i in range(len(param_data)):
@@ -565,6 +593,17 @@ def f_be_de(param_data):
     df_perdedoras['CloseTime'] = list([str(i)[0:10] for i in df_perdedoras['CloseTime']])
     df_perdedoras['OpenTime'] = list([str(i)[0:10] for i in df_perdedoras['OpenTime']])
 
+    # Contador de ocurrencias
+    ocurrencias = 0
+    ocurrencias += 1
+
+    operaciones = 0
+    operaciones += 1
+
+    tsmp = 0
+    tsmp += 1
+
+
     for i in range(len(df_ganadoras)):
         for j in range(len(df_perdedoras)):
             # Marcar inicio y final de las operaciones perdedoras
@@ -574,7 +613,7 @@ def f_be_de(param_data):
             dias_tot = pd.date_range(start=inicio_op, end=fin_op, freq='D')
             # Ciclo para ver si en el momento que la ganadora cerró estaba abierta la operación perdedora
             if df_ganadoras['CloseTime'][i] in dias_tot:
-                # Inicializar contador de ocurrencias
+                # Contador de ocurrencias
                 ocurrencias = 0
                 ocurrencias += 1
                 # Llenado de operaciones del diccionario

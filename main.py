@@ -18,7 +18,7 @@ import visualizations as vn
 # ---------- 1. ESTADISTICA DESCRIPTIVA
 
 # --- 1.1 Funcion para leer el archivo ya limpio.
-df_data = fn.f_leer_archivo(param_archivo='files/historicos_alcg.csv')
+df_data = fn.f_leer_archivo(param_archivo='files/historicos_igg.csv')
 
 # --- 1.2 Funcion para obtener el multiplicador para diferencia de pips
 ins = dt.ins
@@ -27,7 +27,7 @@ pip_size = fn.f_pip_size(param_ins='eurusd')
 
 # -------------         Funcion de prueba para los instrumentos
 # Instrumentos en mayuscula
-instruments = fn.f_instrument()
+#instruments = fn.f_instrument()
 
 # --- 1.3 Funcion de transformaciones de tiempo en segundos
 df_data = fn.f_columnas_tiempos(param_data=df_data)
@@ -75,7 +75,7 @@ sesgos_graph = vn.sesgos(sesgos)
 
 """ 
 
-# PRUEBA
+# PRUEBA para usar la descarga de precios en behavioral finance
 # Nueva columna de ratio del capital acumulado
 param_data = df_data
 param_data['profit_acm_ratio'] = 0
