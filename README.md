@@ -1,10 +1,15 @@
-#Lab3: Behavioral Finance
+#PROYECTO DE APLICACIÓN PROFESIONAL (PAP)
+
+### 4J05 - OPTIMIZACIÓN DE PROGRAMAS DE INVERSIÓN EN INTERMEDIARIOS FINANCIEROS
 
 ## Description
-En este proyecto se analizan los históricos del laboratorio 2 a partir de herramientas computacionales, 
-en donde se analiza el desempeño de las operaciones realizadas personalmente
-a lo largo del laboratorio pasado, donde se hicieron operaciones 
-a través de Oanda con CFD's, para ahora analizar operaciones ganadoras y perdedoras, introduciendo el behavioral finance.
+
+El impacto de esta investigación va dirigida a contribuir e innovar el proceso de estrategias de inversión que realizan 
+actualmente los fondos de pensión (AFORES) en México. Siendo el rendimiento un factor determinante para el retiro de 
+futuras generaciones. 
+
+Tomando en cuenta el contexto actual y recientes reformas en la materia, se ha convertido 
+en una problemática de suma importancia hoy en día para nuestra sociedad.
 
 ## Install dependencies
 
@@ -18,34 +23,27 @@ Or you can manually install one by one using the name and version in the file.
 
 Un ejemplo de las funciones usadas en functions.py :
 
-METRICAS DE ATRIBUCION AL DESEMPEÑO
+Función para leer bases de datos
 
-Evolucion de capital en la cuenta de trading
+    def f_leer_archivo(param_archivo):
+    """
+    Funcion para leer el archivo de nuestras bases de datos
 
-    def f_profit_acm_d(param_data):
-        """
-        Funcion para agregar columna de evolución de capital.
-    
-        Parameters
-        ----------
-        param_data: DataFrame
-                DataFrame que contiene la informacion de las operaciones en oanda actualizado.
-    
-        Returns
-        -------
-        param_data: DataFrame
-                Dataframe actualizado con columna de evolución de capital inicializada con $100,000 Usd
-                y se suma las ganancias o perdidas de la columna 'profit_acm'.
-        """
-    
-        # Columna inicializada en $100,000 donde se le suma/resta el profit acumulado
-        param_data['profit_acm_d'] = 100000 + param_data.profit_acm
-    
-        return param_data.copy()
+    Parameters
+    ----------
+    param_archivo: DataFrame
+            Dataframe de un csv de los datos
 
-## Authors
-*Andrea Lizette Contreras González*
-*Isamar Garcia Gomez*
+    Returns
+    -------
+    param_archivo: DataFrame
+            Dataframe de la base de datos que solicitemos
+    """
+    abspath = path.abspath(param_archivo)
+    param_archivo = pd.read_csv(abspath)
+
+    return param_archivo
+## Author
 *Erendira Marin Haro*
 
 ## License
@@ -57,4 +55,4 @@ works using a licensed work, under the same license. Copyright and license notic
 must be preserved. Contributors provide an express grant of patent rights.*
 
 ## Contact
-*For more information in reggards of this repo, please contact: Andrea Contreras  if708857@iteso.mx*
+*For more information in reggards of this repo, please contact: Erendira Marin Haro  if705604@iteso.mx*
